@@ -8,7 +8,7 @@ Este projeto foi desenvolvido usando Visual Studio 2017, com perfil x64/Debug.
 Para compilar no linux, basta ir na pasta raiz: g++ -O3 vanEmBoas.cpp -o vanemboas
 # Modo de usar
 
-./vaemboas input.txt output.txt
+./vanemboas input.txt output.txt
 
 input.txt: Arquivo de Entrada formato do projeto. 
 output.txt: Arquivo de Saida formato do projeto. Deve ser criado antes de chamar o programa.
