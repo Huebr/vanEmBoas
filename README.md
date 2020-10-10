@@ -5,10 +5,10 @@ Implementação Van Em Boas usando SimpleHashingTable para disciplina de Estrutu
 
 Este projeto foi desenvolvido usando Visual Studio 2017, com perfil x64/Debug.
 
-Para compilar no linux, basta ir na pasta raiz: g++ -O3 vanEmBoas.cpp -o hashing
+Para compilar no linux, basta ir na pasta raiz: g++ -O3 vanEmBoas.cpp -o vanemboas
 # Modo de usar
 
-./hashing input.txt output.txt
+./vaemboas input.txt output.txt
 
 input.txt: Arquivo de Entrada formato do projeto. 
 output.txt: Arquivo de Saida formato do projeto. Deve ser criado antes de chamar o programa.
