@@ -1,19 +1,19 @@
 # vanEmBoas
 Implementação Van Em Boas usando SimpleHashingTable para disciplina de Estrutura de Dados Avançados UFC 2020.1. 
 
-#Ambiente
+# Ambiente
 
 Este projeto foi desenvolvido usando Visual Studio 2017, com perfil x64/Debug.
 
 Para compilar no linux, basta ir na pasta raiz: g++ -O3 Hashing.cpp -o hashing
-Modo de usar
+# Modo de usar
 
 ./hashing input.txt output.txt
 
 input.txt: Arquivo de Entrada formato do projeto. 
 output.txt: Arquivo de Saida formato do projeto. Deve ser criado antes de chamar o programa.
 
-#Projeto
+# Projeto
 
 Imprementar uma van Emde Boas  que utiliza espaço linear.
 
