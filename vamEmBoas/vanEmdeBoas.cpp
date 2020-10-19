@@ -163,7 +163,7 @@ int main(int argc, char **argv)
 	int data;
 	char trash;
 	int64_t *result;
-
+	initialize_table();
 
 	if (fscanf(fp, "%c%c%c:%d", &op[0], &op[1], &op[2], &data) == 4) {
 		do {

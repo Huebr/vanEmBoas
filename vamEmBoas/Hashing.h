@@ -17,9 +17,21 @@ struct item {
 	int8_t  bit = 0;
 };
 
+int64_t T[8][256];
+void initialize_table() {
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+	std::mt19937 generator(seed);
+
+	for (int i = 0; i < 8; ++i) {
+		for (int j = 0; j < 256; ++j) {
+			T[i][j] = generator();
+		}
+	}
+
+}
+
 template <class element,class tipo>
 struct hashtable{
-	int64_t T[8][256];
 	int64_t n_elems = 0;
 	int64_t n_removed = 0;
 	vector<element> *ht;
@@ -27,12 +39,10 @@ struct hashtable{
 	hashtable() {
 		ht = new vector<element>(4);
 		ht->resize(4);
-		initialize_table();
 	}
 	hashtable(int size) {
 		ht = new vector<element>(size);
 		ht->resize(size);
-		initialize_table();
 	}
 	~hashtable() {
 		if (ht != nullptr) {
@@ -48,17 +58,7 @@ struct hashtable{
 		}
 	}
 
-	void initialize_table() {
-		unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-		std::mt19937 generator(seed);
 
-		for (int i = 0; i < 8; ++i) {
-			for (int j = 0; j < 256; ++j) {
-				T[i][j] = generator();
-			}
-		}
-
-	}
 
 	// simple table hashing implementation
 	int64_t SimpleTableHashing(int64_t input)
