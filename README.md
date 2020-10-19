@@ -1,14 +1,14 @@
 # vanEmBoas
-Implementação Van Em Boas usando SimpleHashingTable para disciplina de Estrutura de Dados Avançados UFC 2020.1. 
+Implementação Van Emde Boas usando SimpleHashingTable para disciplina de Estrutura de Dados Avançados UFC 2020.1. 
 
 # Ambiente
 
 Este projeto foi desenvolvido usando Visual Studio 2017, com perfil x64/Debug.
 
-Para compilar no linux, basta ir na pasta raiz: g++ -O3 vanEmBoas.cpp -o vanemboas
+Para compilar no linux, basta ir na pasta raiz: g++ -O3 vanEmdeBoas.cpp -o vanemdeboas
 # Modo de usar
 
-./vanemboas input.txt output.txt
+./vanemdeboas input.txt output.txt
 
 input.txt: Arquivo de Entrada formato do projeto. 
 output.txt: Arquivo de Saida formato do projeto. Deve ser criado antes de chamar o programa.
