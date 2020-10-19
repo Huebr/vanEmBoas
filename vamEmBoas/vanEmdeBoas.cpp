@@ -12,17 +12,17 @@
 
 using namespace std;
 
-int64_t high(int64_t x) {
-	return x >> 32;
+int64_t high(int64_t x,int8_t half_size) {
+	return int64_t(x) >> half_size;
 
 }
 
-int64_t lower(int64_t x) {
-	return x & ((1 << 32) - 1);
+int64_t lower(int64_t x,int8_t half_size) {
+	return x&(int64_t(1) << half_size) - 1;
 }
 
-int64_t join(int64_t c, int64_t i) {
-	return (c << 32) | i;
+int64_t join(int64_t c, int64_t i,int8_t half_size) {
+	return (c << half_size) | i;
 }
 
 
@@ -32,12 +32,14 @@ struct VEB {
 	int64_t* min = nullptr;
 	int64_t max;
 	VEB* resumo = nullptr;
+	int8_t hf;
 	hashtable<item<VEB>,VEB> cluster;
 
 	//create table to be used by simple hashing
 	VEB() {
-
+		hf = 32;
 	}
+	VEB(int8_t size) :hf(size) {};
 	~VEB() {
 		delete min;
 		delete resumo;
@@ -50,23 +52,25 @@ struct VEB {
 			max = x;
 		}
 		else {
+			if (x == *(min))return;
 			if (x < *(min)) {
 				int temp = x;
 				x = *(min);
 				*(min) = temp;
 			}
-
-			if (cluster.buscar(high(x)) == nullptr) {
-				cluster.incluir(high(x), new VEB(),true);
-			}
-			if (cluster.buscar(high(x))->min == nullptr) {
-				if (resumo == nullptr) resumo = new VEB();
-				(*resumo).incluir(high(x));
+			if (hf > 1) {
+				if (cluster.buscar(high(x, hf)) == nullptr) {
+					cluster.incluir(high(x, hf), new VEB(hf >> 1), true);
+				}
+				if (cluster.buscar(high(x, hf))->min == nullptr) {
+					if (resumo == nullptr) resumo = new VEB(hf >> 1);
+					(*resumo).incluir(high(x, hf));
+				}
+				cluster.buscar(high(x, hf))->incluir(lower(x, hf));
 			}
 			if (x > max) {
 				max = x;
 			}
-			cluster.buscar(high(x))->incluir(lower(x));
 		}
 
 	}
@@ -74,53 +78,72 @@ struct VEB {
 	int64_t* predecessor(int64_t x) {
 		int64_t* out;
 		if (min == nullptr) return nullptr;
+		else if (hf==1) {
+			if (x == 1 && *(min) == 0) {
+				out = new int64_t(0);
+				return out;
+			}
+			else return nullptr;
+		}
 		else if (x > max) {
 			out = new int64_t(max);
 			return out;
 		}
 		else if (x < *(min)) return nullptr;
-		else if (cluster.buscar(high(x))!=nullptr&&lower(x) > *(cluster.buscar(high(x))->min)) {
-			int64_t p = join(high(x), *(cluster.buscar(high(x))->predecessor(lower(x))));
+		else if (cluster.buscar(high(x,hf))!=nullptr&&lower(x,hf) > *(cluster.buscar(high(x,hf))->min)) {
+			int64_t p = join(high(x,hf), *(cluster.buscar(high(x,hf))->predecessor(lower(x,hf))),hf);
 			out = new int64_t(p);
 			return out;
 		}
-		int64_t c1 = *(resumo->predecessor(high(x)));
-		out = new int64_t(join(c1, cluster.buscar(c1)->max));
+		int64_t c1 = *(resumo->predecessor(high(x,hf)));
+		out = new int64_t(join(c1, cluster.buscar(c1)->max,hf));
 		return out;
 	}
 
 	int64_t* sucessor(int64_t x) {
 		int64_t* out;
 		if (min == nullptr) return nullptr;
+		else if (hf == 1) {
+			if (x == 0 && *(min) == 1) {
+				out = new int64_t(1);
+				return out;
+			}
+			else return nullptr;
+		}
 		else if (x > max) return nullptr;
 		else if (x < *(min)) return min;
-		else if (cluster.buscar(high(x)) != nullptr&&lower(x) < cluster.buscar(high(x))->max) {
-			int64_t p = join(high(x),*(cluster.buscar(high(x))->sucessor(lower(x))));
+		else if (cluster.buscar(high(x,hf)) != nullptr&&lower(x,hf) < cluster.buscar(high(x,hf))->max) {
+			int64_t p = join(high(x,hf),*(cluster.buscar(high(x,hf))->sucessor(lower(x,hf))),hf);
 			out = new int64_t(p);
 			return out;
 		}
-		int64_t c1 = *(resumo->sucessor(high(x)));
-		out = new int64_t(join(c1, *(cluster.buscar(c1)->min)));
+		int64_t c1 = *(resumo->sucessor(high(x,hf)));
+		out = new int64_t(join(c1, *(cluster.buscar(c1)->min),hf));
 		return out;
 	}
 
 
 	void remover(int64_t x) {
 		if (min == nullptr) return;
-		if (x == *(min)) {
+		else if (hf==1) {
+			if (x == 0)*(min) = 1;
+			else *(min) = 0;
+			max = *(min);
+		}
+		else if (x == *(min)) {
 			if (resumo == nullptr) {
 				delete min;
 				min = nullptr;
 				return;
 			}
 			int64_t c = *(resumo->min);
-			*(min) = join(c,*(cluster.buscar(c)->min));
+			*(min) = join(c,*(cluster.buscar(c)->min),hf);
 			x = *(min);
 		}
-		cluster.buscar(high(x))->remover(lower(x));
-		if (cluster.buscar(high(x))->min == nullptr) {
-			cluster.remover(high(x));
-			resumo->remover(high(x));
+		cluster.buscar(high(x,hf))->remover(lower(x,hf));
+		if (cluster.buscar(high(x,hf))->min == nullptr) {
+			cluster.remover(high(x,hf));
+			resumo->remover(high(x,hf));
 		}
 		if (resumo->min == nullptr) {
 			max = *(min);
@@ -129,7 +152,7 @@ struct VEB {
 		}
 		else {
 			int64_t c1 = resumo->max;
-			max = join(c1, cluster.buscar(c1)->max);
+			max = join(c1, cluster.buscar(c1)->max,hf);
 		}
 	}
 
