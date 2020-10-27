@@ -29,6 +29,15 @@ void initialize_table() {
 	}
 
 }
+int64_t modulo(int64_t a, int64_t b) {
+	int64_t m = a % b;
+	if (m < 0) {
+		// m += (b < 0) ? -b : b; // avoid this form: it is UB when b == INT_MIN
+		m = (b < 0) ? m - b : m + b;
+	}
+	return m;
+}
+
 
 template <class element,class tipo>
 struct hashtable{
@@ -103,7 +112,7 @@ struct hashtable{
 		int64_t hash = SimpleTableHashing(data);
 		int64_t m = ht->capacity();
 		for (int i = 0; i < m; ++i) {
-			int64_t idx = (hash + i) % m;
+			int64_t idx = modulo(hash + i, m);
 			if ((*ht)[idx].bit != 1) {
 				if ((*ht)[idx].bit == 3) n_removed--;
 				(*ht)[idx].data = data;
@@ -124,7 +133,7 @@ struct hashtable{
 		int64_t hash = SimpleTableHashing(data);
 		int64_t m = ht->capacity();
 		for (int i = 0; i < m; ++i) {
-			int64_t idx = (hash + i) % m;
+			int64_t idx = modulo(hash + i, m);
 			if (data == (*ht)[idx].data && (*ht)[idx].bit == 1) {
 				return (*ht)[idx].p;
 			}
@@ -136,6 +145,7 @@ struct hashtable{
 		int64_t m = ht->capacity();
 		vector<element> *temp = ht;
 		ht = new vector<element>(m);
+		n_removed = 0;
 		for (int i = 0; i < m; ++i) {
 			if ((*temp)[i].bit == 1)incluir((*temp)[i].data, (*temp)[i].p, false);
 		}
@@ -149,7 +159,7 @@ struct hashtable{
 		bool cleared = false;
 
 		for (int i = 0; i < m; ++i) {
-			int64_t idx = (hash + i) % m;
+			int64_t idx = modulo(hash + i, m);
 			if ((*ht)[idx].data == data && (*ht)[idx].bit == 1) {
 				(*ht)[idx].bit = 3;
 				delete (*ht)[idx].p;
@@ -167,7 +177,6 @@ struct hashtable{
 			}
 			else if (n_removed > m / 4) limpar();
 		}
-		else cout << hash % m << " " << -1 << endl;
 	}
 
 };
