@@ -155,15 +155,20 @@ struct VEB {
 		if (cluster.buscar(high(x,fw >>1))->min == nullptr) {
 			cluster.remover(high(x,fw >>1));
 			resumo->remover(high(x,fw >>1));
+			if (x == max) {
+				if (resumo->min == nullptr) {
+					max = *(min);
+					delete resumo;
+					resumo = nullptr;
+				}
+				else {
+					int64_t c1 = resumo->max;
+					max = join(c1, cluster.buscar(c1)->max, fw >> 1);
+				}
+			}
 		}
-		if (resumo->min == nullptr) {
-			max = *(min);
-			delete resumo;
-			resumo = nullptr;
-		}
-		else {
-			int64_t c1 = resumo->max;
-			max = join(c1, cluster.buscar(c1)->max,fw >>1);
+		else if(x == max){
+			max = join(high(x, fw >> 1), cluster.buscar(high(x, fw >> 1))->max, fw >> 1);
 		}
 	}
 
